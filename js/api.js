@@ -44,7 +44,7 @@ function jsonpGet(url, timeoutMs) {
     const cbName = "__gascb_" + Date.now() + "_" + Math.floor(Math.random() * 1e9);
     const timer = setTimeout(() => {
       cleanup();
-      reject(new Error("Request timed out"));
+      reject(new Error("JSONP: Request timed out — check Apps Script is deployed with 'Anyone' access."));
     }, timeoutMs || 20000);
     function cleanup() {
       clearTimeout(timer);
@@ -64,7 +64,7 @@ function jsonpGet(url, timeoutMs) {
     script.async = true;
     script.onerror = function () {
       cleanup();
-      reject(new Error("Network error (JSONP)"));
+      reject(new Error("JSONP: Script blocked — Apps Script not redeployed with JSONP support, or extension blocking script.google.com. Trying POST fallback…"));
     };
     (document.head || document.documentElement).appendChild(script);
   });
@@ -111,7 +111,11 @@ function normalizeResp(json) {
 }
 
 /* ================================
-   GET — Fetch Attendance (JSONP)
+   GET — Fetch Attendance
+   Strategy: Try JSONP first; if it fails (e.g. old Apps Script deployment,
+   extension block, MIME nosniff block) fall back to form-urlencoded POST
+   with action=getAttendance. POST is a CORS "simple request" — no preflight,
+   survives 302 redirects to googleusercontent.com reliably.
    ================================ */
 async function fetchAttendance() {
   if (DEMO_MODE === true) {
@@ -121,12 +125,25 @@ async function fetchAttendance() {
   if (!apiConfigured()) {
     return { success: false, error: "Google Apps Script API is not configured.", notConfigured: true, data: [] };
   }
+
+  // Transport 1: JSONP (ideal — GET semantics, cached)
   try {
     const raw = await jsonpGet(API_URL, 25000);
-    const json = normalizeResp(raw);
-    return json;
-  } catch (e) {
-    return { success: false, error: e.message || "Unable to fetch attendance.", data: [] };
+    return normalizeResp(raw);
+  } catch (_e1) {
+    // fall through silently to Transport 2
+  }
+
+  // Transport 2: form-urlencoded POST with action=getAttendance
+  try {
+    const raw = await formPost({ action: "getAttendance" });
+    return normalizeResp(raw);
+  } catch (e2) {
+    return {
+      success: false,
+      error: e2.message || "Cannot reach Apps Script — Redeploy Code.gs with 'Anyone' access, disable ad/privacy extensions, then refresh.",
+      data: []
+    };
   }
 }
 
