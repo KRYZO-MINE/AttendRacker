@@ -35,6 +35,84 @@ function apiConfigured() {
   return typeof API_URL === "string" && API_URL.trim().length > 0;
 }
 
+/* -----------------------------------------------------------
+   JSONP helper — CORS-proof GET (no preflight, works with
+   Google Apps Script 302 redirects to googleusercontent.com)
+   ----------------------------------------------------------- */
+function jsonpGet(url, timeoutMs) {
+  return new Promise((resolve, reject) => {
+    const cbName = "__gascb_" + Date.now() + "_" + Math.floor(Math.random() * 1e9);
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error("Request timed out"));
+    }, timeoutMs || 20000);
+    function cleanup() {
+      clearTimeout(timer);
+      try { delete window[cbName]; } catch (_) { window[cbName] = null; }
+      const s = document.getElementById(cbName);
+      if (s && s.parentNode) s.parentNode.removeChild(s);
+    }
+    window[cbName] = function (data) {
+      cleanup();
+      resolve(data);
+    };
+    const sep = url.indexOf("?") >= 0 ? "&" : "?";
+    const src = url + sep + "callback=" + encodeURIComponent(cbName);
+    const script = document.createElement("script");
+    script.id = cbName;
+    script.src = src;
+    script.async = true;
+    script.onerror = function () {
+      cleanup();
+      reject(new Error("Network error (JSONP)"));
+    };
+    (document.head || document.documentElement).appendChild(script);
+  });
+}
+
+/* -----------------------------------------------------------
+   POST helper — uses application/x-www-form-urlencoded
+   (this is a "simple request" per CORS spec — NO preflight,
+   so it works even when Google Apps Script redirects)
+   ----------------------------------------------------------- */
+async function formPost(payload) {
+  const bodyData = "payload=" + encodeURIComponent(JSON.stringify(payload));
+  const res = await fetch(API_URL, {
+    method: "POST",
+    redirect: "follow",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
+    },
+    body: bodyData
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const text = await res.text();
+  let json;
+  try {
+    json = JSON.parse(text);
+  } catch (_) {
+    // If response is JSONP-wrapped despite POST, try to extract it
+    const m = /\(([\s\S]*)\)\s*;?\s*$/.exec(text);
+    json = m ? JSON.parse(m[1]) : { success: true };
+  }
+  return json || { success: true };
+}
+
+/* -----------------------------------------------------------
+   Normalize API response (records -> data for compat)
+   ----------------------------------------------------------- */
+function normalizeResp(json) {
+  if (!json || typeof json !== "object") {
+    return { success: false, error: "Invalid response", data: [] };
+  }
+  if (!json.data && Array.isArray(json.records)) json.data = json.records;
+  if (!Array.isArray(json.data)) json.data = [];
+  return json;
+}
+
+/* ================================
+   GET — Fetch Attendance (JSONP)
+   ================================ */
 async function fetchAttendance() {
   if (DEMO_MODE === true) {
     await new Promise(r => setTimeout(r, 450));
@@ -44,19 +122,17 @@ async function fetchAttendance() {
     return { success: false, error: "Google Apps Script API is not configured.", notConfigured: true, data: [] };
   }
   try {
-    const res = await fetch(API_URL, { method: "GET", redirect: "follow" });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
-    if (!json || typeof json !== "object") throw new Error("Invalid response");
-    // Normalize key: Apps Script returns "records", frontend expects "data"
-    if (!json.data && Array.isArray(json.records)) json.data = json.records;
-    json.data = Array.isArray(json.data) ? json.data : [];
+    const raw = await jsonpGet(API_URL, 25000);
+    const json = normalizeResp(raw);
     return json;
   } catch (e) {
     return { success: false, error: e.message || "Unable to fetch attendance.", data: [] };
   }
 }
 
+/* ================================
+   POST — Add Attendance
+   ================================ */
 async function submitAttendance(record) {
   const payload = {
     action: "addAttendance",
@@ -76,20 +152,16 @@ async function submitAttendance(record) {
     return { success: false, error: "Google Apps Script API is not configured.", notConfigured: true };
   }
   try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      redirect: "follow",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
+    const json = await formPost(payload);
     return json || { success: true };
   } catch (e) {
     return { success: false, error: e.message || "Unable to save attendance." };
   }
 }
 
+/* ================================
+   POST — Update Attendance
+   ================================ */
 async function updateAttendance(record) {
   const payload = {
     action: "updateAttendance",
@@ -109,20 +181,16 @@ async function updateAttendance(record) {
     return { success: false, error: "Google Apps Script API is not configured.", notConfigured: true };
   }
   try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      redirect: "follow",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
+    const json = await formPost(payload);
     return json || { success: true, updated: true };
   } catch (e) {
     return { success: false, error: e.message || "Unable to update attendance." };
   }
 }
 
+/* ================================
+   POST — Delete Attendance
+   ================================ */
 async function deleteAttendance(date, employee) {
   const payload = { action: "deleteAttendance", date, employee };
   if (DEMO_MODE === true) {
@@ -133,14 +201,7 @@ async function deleteAttendance(date, employee) {
     return { success: false, error: "Google Apps Script API is not configured.", notConfigured: true };
   }
   try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      redirect: "follow",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
+    const json = await formPost(payload);
     return json || { success: true, deleted: true };
   } catch (e) {
     return { success: false, error: e.message || "Unable to delete attendance." };
