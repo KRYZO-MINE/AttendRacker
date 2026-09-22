@@ -1,0 +1,1245 @@
+Build a complete, production-quality Attendance Management Web App for:
+
+SANYAM CONSULTANTS
+Attendance Tracker
+
+The application must be a modern, premium, mobile-first attendance management system that connects to a Google Sheet through a Google Apps Script API.
+
+==================================================
+1. TECHNOLOGY STACK
+==================================================
+
+Use ONLY:
+
+- HTML5
+- CSS3
+- Tailwind CSS
+- Vanilla JavaScript
+
+Do NOT use:
+
+- React
+- Next.js
+- Vue
+- Angular
+- Bootstrap
+- jQuery
+- Any unnecessary frontend framework
+
+The application should be deployable directly on Vercel/GitHub Pages.
+
+Use Tailwind CSS for the majority of UI styling, with a small custom CSS layer for advanced animations, effects and responsive behavior.
+
+JavaScript should handle:
+- Form interactions
+- API requests
+- Attendance submission
+- Attendance fetching
+- Filtering
+- Search
+- Status calculations
+- Time calculations
+- Loading states
+- Error handling
+- Toast notifications
+- Mobile navigation
+- Modal/drawer interactions
+
+Keep the code clean, modular and production-ready.
+
+==================================================
+2. MAIN DESIGN DIRECTION
+==================================================
+
+Create a premium UI based on:
+
+THE CENTRAL SPLIT / SHOWCASE LAYOUT
+
+The visual style should feel like a premium modern SaaS dashboard rather than a basic attendance form.
+
+Design keywords:
+
+- Premium
+- Minimal
+- Professional
+- Sharp
+- Modern
+- Clean
+- High contrast
+- Corporate
+- Mobile-first
+- Smooth
+- Fast
+- Elegant
+- Slightly futuristic
+
+The layout should use a strong central visual split.
+
+Desktop:
+
+LEFT SIDE:
+Branding / showcase / today's summary
+
+RIGHT SIDE:
+Attendance form / employee interaction
+
+Mobile:
+The two sections must stack naturally and become a single smooth scrolling interface.
+
+Do NOT make the mobile version look like a shrunk desktop layout.
+
+==================================================
+3. COLOR SYSTEM
+==================================================
+
+Use the 60-30-10 color rule strictly.
+
+Primary palette:
+
+60% — VAMPIRE BLACK
+#0B0B0F
+#101014
+#141419
+
+This should dominate:
+- Main background
+- Large panels
+- Navigation
+- Dashboard sections
+- Empty spaces
+
+30% — DARK / CHARCOAL SURFACE
+#18181D
+#202026
+#292930
+
+Use for:
+- Cards
+- Input fields
+- Tables
+- Secondary panels
+- Containers
+- Elevated surfaces
+
+10% — BLAZE ORANGE
+Use approximately:
+#FF5A1F
+#FF6A00
+#FF7A00
+
+Use orange ONLY for important attention areas:
+
+- Primary buttons
+- Active navigation
+- Status highlights
+- Important numbers
+- Focus states
+- Progress indicators
+- Icons
+- Small decorative accents
+- CTA elements
+
+Do NOT flood the entire interface with orange.
+
+The interface should primarily feel black/dark with controlled orange accents.
+
+==================================================
+4. TYPOGRAPHY
+==================================================
+
+Use a modern professional font such as:
+
+Inter
+
+or
+
+Manrope
+
+Use:
+- Strong bold headings
+- Medium-weight labels
+- Comfortable body text
+- Clear numeric typography
+
+Attendance numbers should have strong visual hierarchy.
+
+Example:
+
+PRESENT
+04
+
+HALF DAY
+00
+
+LEAVE
+01
+
+Numbers should be visually prominent.
+
+==================================================
+5. PAGE STRUCTURE
+==================================================
+
+Create the following structure:
+
+BODY
+|
+|-- TOP NAVBAR
+|
+|-- MAIN SHOWCASE
+|     |
+|     |-- LEFT SHOWCASE PANEL
+|     |     |-- Brand
+|     |     |-- Heading
+|     |     |-- Date
+|     |     |-- Attendance Summary
+|     |     |-- Quick Stats
+|     |
+|     |-- RIGHT ATTENDANCE PANEL
+|           |-- Form
+|           |-- Employee
+|           |-- Date
+|           |-- In Time
+|           |-- Out Time
+|           |-- Status
+|           |-- Notes
+|           |-- Submit
+|
+|-- TODAY'S ATTENDANCE
+|
+|-- FILTER / SEARCH
+|
+|-- ATTENDANCE TABLE / CARDS
+|
+|-- FOOTER
+
+==================================================
+6. NAVBAR
+==================================================
+
+Create a minimal premium navbar.
+
+Left:
+
+SANYAM
+CONSULTANTS
+
+with a small orange accent.
+
+Title:
+
+Attendance Tracker
+
+Right side desktop:
+
+- Dashboard
+- Attendance
+- Reports
+
+and a small profile/admin button.
+
+Mobile:
+
+Show:
+Logo + hamburger button
+
+When hamburger is clicked:
+Open a smooth mobile navigation drawer.
+
+Navigation should have:
+- Dashboard
+- Mark Attendance
+- Records
+- Reports
+
+Add smooth animations.
+
+==================================================
+7. HERO / CENTRAL SHOWCASE
+==================================================
+
+Create a large central split showcase section.
+
+LEFT SIDE:
+
+Small eyebrow:
+
+SANYAM CONSULTANTS
+
+Main heading:
+
+Attendance
+Management
+
+with "Management" or an important word highlighted in Blaze Orange.
+
+Subheading:
+
+"Simple, accurate and centralized employee attendance management."
+
+Show today's date dynamically.
+
+Example:
+
+MONDAY
+22 SEPTEMBER 2026
+
+Below it create the attendance statistics.
+
+Three cards:
+
+PRESENT
+04
+
+HALF DAY
+00
+
+LEAVE
+01
+
+Use large numbers.
+
+Cards should have subtle borders and hover animations.
+
+Do NOT use excessive gradients.
+
+==================================================
+8. RIGHT SIDE — ATTENDANCE FORM
+==================================================
+
+Create a premium attendance form card.
+
+Heading:
+
+Mark Attendance
+
+Subtitle:
+
+"Record today's employee attendance."
+
+Fields:
+
+1. Employee Name
+
+Dropdown/select.
+
+Example employees:
+
+Vijay
+Sahil
+Janvi
+Anju
+Garvi
+
+2. Date
+
+Default to today's date.
+
+Allow date selection.
+
+3. In Time
+
+Time input.
+
+4. Out Time
+
+Time input.
+
+5. Status
+
+Dropdown:
+
+Present
+Half Day
+Leave
+
+6. Notes
+
+Optional textarea.
+
+Placeholder:
+
+"Add a note if required..."
+
+Primary button:
+
+SAVE ATTENDANCE
+
+Button should use Blaze Orange.
+
+Add a small loading spinner when submitting.
+
+==================================================
+9. IMPORTANT ATTENDANCE LOGIC
+==================================================
+
+Implement these rules:
+
+If Status = Present:
+- In Time should normally be required.
+- Out Time can remain empty if the employee has not checked out yet.
+
+If Status = Half Day:
+- In Time required.
+- Out Time optional.
+
+If Status = Leave:
+- Time fields may be empty.
+- The system should allow Leave without In/Out time.
+
+If the user enters both In Time and Out Time:
+
+Automatically calculate:
+
+Total Hours
+
+Example:
+
+09:12 AM
+to
+06:00 PM
+
+Result:
+
+8h 48m
+
+Do NOT calculate negative or invalid durations.
+
+If Out Time is earlier than In Time:
+Show:
+
+"Out time cannot be earlier than in time."
+
+Do not submit until corrected.
+
+==================================================
+10. GOOGLE SHEET DATABASE
+==================================================
+
+The Google Sheet structure is:
+
+Date
+Employee Name
+In Time
+Out Time
+Total Hours
+Status
+Notes
+
+Example:
+
+2026-09-22 | Vijay | 09:48 AM | | | Present |
+2026-09-22 | Sahil | 09:12 AM | | | Present |
+2026-09-22 | Janvi | 09:50 AM | | | Present |
+2026-09-22 | Anju | AB | | | Leave |
+2026-09-22 | Garvi | 09:46 AM | | | Present |
+
+The website must communicate with Google Sheets through a Google Apps Script REST API.
+
+Create a clearly marked configuration section in JavaScript:
+
+const API_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
+
+Do not hard-code fake API responses in the final production implementation.
+
+Create separate functions:
+
+fetchAttendance()
+submitAttendance()
+updateAttendance()
+deleteAttendance()
+
+If update/delete endpoints are not available yet, structure the code so they can easily be added later.
+
+==================================================
+11. GOOGLE APPS SCRIPT EXPECTED API
+==================================================
+
+Design the frontend expecting JSON responses.
+
+GET:
+
+API_URL
+
+Should return:
+
+{
+  "success": true,
+  "data": [
+    {
+      "date": "2026-09-22",
+      "employee": "Vijay",
+      "inTime": "09:48 AM",
+      "outTime": "",
+      "totalHours": "",
+      "status": "Present",
+      "notes": ""
+    }
+  ]
+}
+
+POST:
+
+API_URL
+
+Body:
+
+{
+  "action": "addAttendance",
+  "date": "2026-09-22",
+  "employee": "Sahil",
+  "inTime": "09:12 AM",
+  "outTime": "06:00 PM",
+  "totalHours": "8h 48m",
+  "status": "Present",
+  "notes": ""
+}
+
+Handle API errors gracefully.
+
+==================================================
+12. TODAY'S ATTENDANCE SECTION
+==================================================
+
+Below the main showcase create:
+
+Today's Attendance
+
+Display all employees for today's selected date.
+
+Desktop:
+Use a clean table.
+
+Columns:
+
+Employee
+In Time
+Out Time
+Total Hours
+Status
+Notes
+Action
+
+Example:
+
+Vijay
+09:48 AM
+—
+—
+Present
+
+Sahil
+09:12 AM
+—
+—
+Present
+
+Janvi
+09:50 AM
+—
+—
+Present
+
+Anju
+—
+—
+—
+Leave
+
+Garvi
+09:46 AM
+—
+—
+Present
+
+==================================================
+13. MOBILE ATTENDANCE RECORDS
+==================================================
+
+IMPORTANT:
+
+Do NOT force a wide table on mobile.
+
+On screens below approximately 768px:
+
+Convert each attendance row into a beautiful card.
+
+Example:
+
+┌─────────────────────────────┐
+│ Sahil                  ●    │
+│ Present                     │
+├─────────────────────────────┤
+│ IN          OUT             │
+│ 09:12 AM    06:00 PM        │
+│                             │
+│ TOTAL HOURS                 │
+│ 8h 48m                      │
+└─────────────────────────────┘
+
+Cards should be touch friendly.
+
+Minimum touch target:
+44px.
+
+==================================================
+14. STATUS COLORS
+==================================================
+
+Status colors should remain compatible with the dark/orange theme.
+
+Present:
+Use subtle green accent.
+
+Half Day:
+Use amber/yellow accent.
+
+Leave:
+Use red/coral accent.
+
+Do not make these colors dominate the UI.
+
+Use them mainly for:
+- Status pills
+- Small indicators
+- Borders
+- Icons
+
+==================================================
+15. SEARCH
+==================================================
+
+Add search functionality.
+
+Search employees by:
+
+- Employee Name
+- Date
+- Status
+
+Example:
+
+Search attendance...
+
+As user types, records should filter instantly.
+
+Show:
+
+"No attendance records found."
+
+when there are no matching records.
+
+==================================================
+16. FILTERS
+==================================================
+
+Add filters:
+
+Date
+Employee
+Status
+
+Status options:
+
+All
+Present
+Half Day
+Leave
+
+Filters should work together.
+
+Example:
+
+Date = 22 Sep 2026
+Employee = Sahil
+Status = Present
+
+Only matching records should display.
+
+==================================================
+17. DASHBOARD STATISTICS
+==================================================
+
+Calculate dynamically from Google Sheet data.
+
+Statistics:
+
+Present
+Half Day
+Leave
+
+Also calculate:
+
+Total Employees
+Attendance Recorded
+Pending Checkout
+
+Example:
+
+TOTAL EMPLOYEES
+05
+
+PRESENT
+04
+
+HALF DAY
+00
+
+LEAVE
+01
+
+PENDING CHECKOUT
+04
+
+Do not hard-code these values.
+
+==================================================
+18. MONTHLY REPORT
+==================================================
+
+Create a Reports section.
+
+Allow selecting:
+
+Month
+Employee
+
+Display:
+
+Working Days
+Present
+Half Days
+Leaves
+Attendance %
+
+Example:
+
+SAHIL
+
+Working Days     24
+Present          21
+Half Day          2
+Leave             1
+Attendance      91.6%
+
+Use simple charts if useful, but keep the UI lightweight.
+
+Use vanilla JavaScript and CSS/Tailwind.
+
+Do not introduce a huge charting library unless absolutely necessary.
+
+==================================================
+19. UX
+==================================================
+
+The application must feel extremely smooth.
+
+Use:
+
+- Skeleton loading
+- Button loading state
+- Toast notifications
+- Smooth transitions
+- Hover effects
+- Focus effects
+- Empty states
+- Error states
+- Success states
+
+Example successful submission:
+
+✓ Attendance saved successfully
+
+Example error:
+
+✕ Unable to save attendance. Please try again.
+
+Never use browser alert().
+
+Use custom toast notifications.
+
+==================================================
+20. FORM UX
+==================================================
+
+When Status = Leave:
+
+Hide or visually disable:
+In Time
+Out Time
+
+Show:
+
+"Time fields are not required for leave."
+
+When Status = Present:
+
+Show normal time inputs.
+
+When Status = Half Day:
+
+Show time inputs.
+
+If user changes status from Leave to Present:
+Restore the time fields.
+
+==================================================
+21. PREVENT DUPLICATE ATTENDANCE
+==================================================
+
+Before submitting:
+
+Check whether the selected employee already has attendance for the selected date.
+
+If duplicate:
+
+Show:
+
+"Attendance already exists for this employee on this date."
+
+Provide option:
+
+Update Existing Record
+
+or
+
+Cancel
+
+Do not silently create duplicate records.
+
+==================================================
+22. RESPONSIVE DESIGN
+==================================================
+
+This is extremely important.
+
+Design mobile FIRST.
+
+Breakpoints:
+
+Mobile:
+320px+
+375px+
+390px+
+430px+
+
+Tablet:
+768px+
+
+Desktop:
+1024px+
+
+Large desktop:
+1440px+
+
+The interface must look intentional at every width.
+
+No:
+- Horizontal scrolling
+- Overflowing tables
+- Cut-off buttons
+- Tiny text
+- Broken cards
+- Fixed-width containers that break mobile
+
+Desktop can use the Central Split layout.
+
+Mobile should stack:
+
+Brand
+↓
+Stats
+↓
+Attendance Form
+↓
+Search
+↓
+Attendance Records
+
+==================================================
+23. MOBILE NAVIGATION
+==================================================
+
+Create a hamburger menu.
+
+When opened:
+- Smooth slide/fade animation
+- Dark overlay
+- Navigation links
+- Close button
+
+Clicking outside closes it.
+
+Pressing Escape closes it.
+
+==================================================
+24. ANIMATIONS
+==================================================
+
+Keep animations subtle and premium.
+
+Use:
+
+- fade-in
+- slide-up
+- scale
+- button press
+- card hover
+- modal transition
+- mobile drawer transition
+
+Duration:
+150ms - 350ms
+
+Do NOT use excessive animations.
+
+Respect:
+
+prefers-reduced-motion
+
+==================================================
+25. VISUAL EFFECTS
+==================================================
+
+Use subtle:
+
+- Borders
+- Shadows
+- Glow around important orange CTA elements
+- Very subtle radial background effects
+- Glass-like surfaces only where appropriate
+
+Avoid:
+- Excessive glassmorphism
+- Excessive gradients
+- Neon gaming UI
+- Excessive orange
+- Huge glowing effects
+
+This is a corporate attendance management system.
+
+==================================================
+26. ACCESSIBILITY
+==================================================
+
+Implement:
+
+- Semantic HTML
+- Proper labels
+- Keyboard navigation
+- Visible focus states
+- ARIA labels where needed
+- Accessible dropdowns
+- Accessible modal/drawer
+- Good color contrast
+- Touch-friendly controls
+
+==================================================
+27. SECURITY
+==================================================
+
+Do not expose:
+
+- Google service account credentials
+- Private API keys
+- Passwords
+- Secret tokens
+
+Frontend should only contain the public Google Apps Script Web App URL if the API architecture requires it.
+
+Validate all input on the frontend.
+
+Assume backend validation will also be implemented.
+
+==================================================
+28. CODE STRUCTURE
+==================================================
+
+Create a clean structure like:
+
+/
+├── index.html
+├── css/
+│   └── style.css
+├── js/
+│   ├── app.js
+│   ├── api.js
+│   ├── attendance.js
+│   └── ui.js
+└── README.md
+
+If the environment requires a single HTML file, keep everything in one file but separate code into clearly marked sections.
+
+==================================================
+29. CODE QUALITY
+==================================================
+
+Requirements:
+
+- No duplicated code
+- No unnecessary libraries
+- Meaningful variable names
+- Functions should have one responsibility
+- Comments only where useful
+- No placeholder lorem ipsum
+- No fake buttons
+- No dead navigation links
+- No console errors
+- No broken interactions
+
+Use modern JavaScript:
+
+const
+let
+async/await
+fetch()
+optional chaining where useful
+template literals
+
+==================================================
+30. INITIAL DATA / EMPTY STATE
+==================================================
+
+For development only, if API_URL is empty:
+
+Show a clear developer message:
+
+"Google Apps Script API is not configured."
+
+Do NOT silently use fake data in production.
+
+You may use clearly isolated mock data only when:
+
+const DEMO_MODE = true;
+
+is manually enabled.
+
+Default:
+
+const DEMO_MODE = false;
+
+==================================================
+31. GOOGLE SHEET COMPATIBILITY
+==================================================
+
+The Google Sheet columns are EXACTLY:
+
+Date
+Employee Name
+In Time
+Out Time
+Total Hours
+Status
+Notes
+
+Do not rename them.
+
+The website should map frontend fields to these exact backend fields.
+
+==================================================
+32. DATE & TIME
+==================================================
+
+Use local Indian time:
+
+Asia/Kolkata
+
+Display dates in a user-friendly format:
+
+22 September 2026
+
+or:
+
+22 Sep 2026
+
+Store backend date consistently as:
+
+YYYY-MM-DD
+
+Use 12-hour display:
+
+09:48 AM
+
+18:00 should display as:
+
+06:00 PM
+
+==================================================
+33. BRANDING
+==================================================
+
+Brand:
+
+Sanyam Consultants
+
+Product:
+
+Attendance Tracker
+
+Use this heading:
+
+"Sanyam Consultants"
+
+and:
+
+"Attendance Management"
+
+Possible tagline:
+
+"Simple. Accurate. Centralized."
+
+Do not add fake company information.
+
+==================================================
+34. FOOTER
+==================================================
+
+Create a minimal footer:
+
+© 2026 Sanyam Consultants
+Attendance Management System
+
+Keep it subtle.
+
+==================================================
+35. FINAL UI QUALITY
+==================================================
+
+The final website must NOT look like a generic AI-generated dashboard.
+
+It should feel intentionally designed.
+
+Prioritize:
+
+1. Mobile experience
+2. Visual hierarchy
+3. Ease of attendance entry
+4. Speed
+5. Readability
+6. Clean responsive layout
+7. Smooth interactions
+8. Professional appearance
+
+The Central Split / Showcase layout should be the main visual identity.
+
+==================================================
+36. FINAL ACCEPTANCE TEST
+==================================================
+
+Before considering the project complete, test:
+
+✓ Page loads without console errors
+✓ Mobile 320px works
+✓ Mobile 375px works
+✓ Mobile 390px works
+✓ Mobile 430px works
+✓ Tablet works
+✓ Desktop works
+✓ Form submits correctly
+✓ Google Apps Script API integration works
+✓ Attendance appears in Google Sheet
+✓ Attendance can be fetched
+✓ Present count updates
+✓ Half Day count updates
+✓ Leave count updates
+✓ Total hours calculate correctly
+✓ Invalid time is rejected
+✓ Leave works without time
+✓ Search works
+✓ Filters work
+✓ Duplicate attendance is detected
+✓ Loading state works
+✓ Success toast works
+✓ Error toast works
+✓ Mobile navigation works
+✓ No horizontal overflow
+✓ No broken UI
+✓ No fake production data
+✓ No console errors
+
+==================================================
+37. IMPORTANT DESIGN RULE
+==================================================
+
+DO NOT simply create a form centered on a page.
+
+The design must have a strong:
+
+CENTRAL SPLIT / SHOWCASE
+
+composition.
+
+Desktop:
+
+┌─────────────────────────────────────────────────────┐
+│ NAVBAR                                              │
+├──────────────────────────┬──────────────────────────┤
+│                          │                          │
+│   SANYAM CONSULTANTS     │   MARK ATTENDANCE        │
+│                          │                          │
+│   Attendance             │   Employee               │
+│   Management             │   Date                   │
+│                          │   In Time                │
+│   Today's Date           │   Out Time               │
+│                          │   Status                 │
+│                          │   Notes                  │
+│   ┌────┐ ┌────┐ ┌────┐  │                          │
+│   │ 04 │ │ 00 │ │ 01 │  │   [ SAVE ATTENDANCE ]    │
+│   └────┘ └────┘ └────┘  │                          │
+│                          │                          │
+├──────────────────────────┴──────────────────────────┤
+│                TODAY'S ATTENDANCE                   │
+│                                                     │
+│  Attendance records / search / filters              │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+
+On mobile:
+
+┌───────────────────────┐
+│ SANYAM CONSULTANTS    │
+│ Attendance Tracker ☰  │
+├───────────────────────┤
+│                       │
+│ Attendance             │
+│ Management             │
+│                       │
+│ ┌────┐ ┌────┐ ┌────┐ │
+│ │ 04 │ │ 00 │ │ 01 │ │
+│ └────┘ └────┘ └────┘ │
+│                       │
+│ MARK ATTENDANCE        │
+│                       │
+│ Employee               │
+│ [ Sahil ▼ ]            │
+│                       │
+│ Date                   │
+│ [22 Sep 2026]          │
+│                       │
+│ In Time                │
+│ [09:12 AM]             │
+│                       │
+│ Out Time               │
+│ [06:00 PM]             │
+│                       │
+│ Status                 │
+│ [ Present ▼ ]          │
+│                       │
+│ [ SAVE ATTENDANCE ]    │
+│                       │
+│ TODAY'S ATTENDANCE     │
+│                       │
+│ ┌───────────────────┐ │
+│ │ Sahil      Present│ │
+│ │ 09:12 → 06:00     │ │
+│ │ Total: 8h 48m     │ │
+│ └───────────────────┘ │
+└───────────────────────┘
+
+Build the complete working application, not just a visual mockup.
+
+The final result should be polished enough to be used by an actual office.
+
+Use Vampire Black as the dominant visual foundation and Blaze Orange as the controlled accent using the 60-30-10 color distribution.
+
+Focus heavily on premium mobile responsiveness, smooth interactions, clean spacing, typography, accessibility and real Google Sheets API integration.

@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0B0B0F" />
+  <title>Sanyam Consultants — Attendance Tracker</title>
+  <meta name="description" content="Simple, accurate and centralized employee attendance management for Sanyam Consultants." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            vb: {
+              950: '#0B0B0F',
+              900: '#101014',
+              850: '#141419'
+            },
+            charcoal: {
+              800: '#18181D',
+              700: '#202026',
+              600: '#292930'
+            },
+            blaze: {
+              DEFAULT: '#FF6A00',
+              500: '#FF5A1F',
+              400: '#FF6A00',
+              300: '#FF7A00'
+            },
+            status: {
+              present: '#22C55E',
+              half: '#F59E0B',
+              leave: '#EF4444'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif']
+          },
+          boxShadow: {
+            'glow-orange': '0 0 0 1px rgba(255,106,0,.35), 0 10px 30px -10px rgba(255,90,31,.45)'
+          },
+          keyframes: {
+            fadeIn: { '0%': { opacity: 0 }, '100%': { opacity: 1 } },
+            slideUp: { '0%': { opacity: 0, transform: 'translateY(14px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } },
+            slideInRight: { '0%': { opacity: 0, transform: 'translateX(100%)' }, '100%': { opacity: 1, transform: 'translateX(0)' } },
+            slideInUp: { '0%': { opacity: 0, transform: 'translateY(24px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } }
+          },
+          animation: {
+            'fade-in': 'fadeIn 250ms ease-out both',
+            'slide-up': 'slideUp 300ms ease-out both',
+            'slide-in-right': 'slideInRight 250ms ease-out both',
+            'slide-in-up': 'slideInUp 300ms ease-out both'
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="min-h-screen bg-vb-950 text-gray-100 font-sans antialiased selection:bg-blaze/30 selection:text-white">
+
+  <header id="top-navbar" role="banner" class="sticky top-0 z-40 backdrop-blur-md bg-vb-950/80 border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="#top" class="flex items-center gap-2.5 group min-h-[44px] -ml-1 pl-1">
+        <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-blaze-500 to-blaze-300 text-white font-extrabold text-sm shadow-glow-orange">S</span>
+        <div class="leading-tight">
+          <div class="text-[11px] font-semibold tracking-[0.18em] text-gray-400">SANYAM</div>
+          <div class="text-sm font-bold tracking-wide text-white"><span class="text-blaze">CONSULT</span>ANTS</div>
+        </div>
+        <span class="hidden md:inline-flex h-5 w-px mx-3 bg-white/10" aria-hidden="true"></span>
+        <span class="hidden md:inline-flex text-sm text-gray-300 font-medium">Attendance Tracker</span>
+      </a>
+
+      <nav class="hidden lg:flex items-center gap-1" aria-label="Primary">
+        <a href="#dashboard" data-nav="dashboard" class="nav-link min-h-[44px] px-3.5 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Dashboard</a>
+        <a href="#mark" data-nav="mark" class="nav-link min-h-[44px] px-3.5 rounded-lg text-sm font-medium text-white bg-white/5">Attendance</a>
+        <a href="#reports" data-nav="reports" class="nav-link min-h-[44px] px-3.5 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Reports</a>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <button id="profile-btn" type="button" aria-label="Admin profile" class="hidden sm:inline-flex items-center justify-center w-10 h-10 rounded-full bg-charcoal-800 border border-white/5 hover:border-blaze/50 transition-colors">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-300">
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M4 21a8 8 0 0 1 16 0"></path>
+          </svg>
+        </button>
+        <button id="hamburger-btn" type="button" aria-label="Open menu" aria-controls="mobile-drawer" aria-expanded="false" class="lg:hidden inline-flex items-center justify-center w-11 h-11 rounded-lg border border-white/5 bg-charcoal-800/60 text-gray-200 hover:text-white hover:bg-charcoal-700 transition">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 7h16M4 12h16M4 17h16"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div id="drawer-overlay" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200" aria-hidden="true"></div>
+  <aside id="mobile-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" class="fixed right-0 top-0 z-50 h-full w-[86%] max-w-sm bg-vb-900 border-l border-white/5 shadow-2xl translate-x-full transition-transform duration-250">
+    <div class="h-16 px-5 flex items-center justify-between border-b border-white/5">
+      <div id="drawer-title" class="text-sm font-semibold text-gray-200 tracking-wide">MENU</div>
+      <button id="drawer-close" type="button" aria-label="Close menu" class="w-10 h-10 -mr-1 rounded-lg flex items-center justify-center text-gray-300 hover:text-white hover:bg-white/5">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+    </div>
+    <nav aria-label="Mobile" class="p-3 space-y-1">
+      <a href="#dashboard" data-mobile-nav class="drawer-link flex items-center gap-3 min-h-[48px] px-3 rounded-lg text-[15px] font-medium text-gray-200 hover:bg-white/5"><span class="w-8 h-8 rounded-md bg-white/5 flex items-center justify-center text-blaze">▦</span>Dashboard</a>
+      <a href="#mark" data-mobile-nav class="drawer-link flex items-center gap-3 min-h-[48px] px-3 rounded-lg text-[15px] font-medium text-white bg-blaze/10 border border-blaze/20"><span class="w-8 h-8 rounded-md bg-blaze/20 flex items-center justify-center text-blaze">✓</span>Mark Attendance</a>
+      <a href="#records" data-mobile-nav class="drawer-link flex items-center gap-3 min-h-[48px] px-3 rounded-lg text-[15px] font-medium text-gray-200 hover:bg-white/5"><span class="w-8 h-8 rounded-md bg-white/5 flex items-center justify-center text-blaze">≡</span>Records</a>
+      <a href="#reports" data-mobile-nav class="drawer-link flex items-center gap-3 min-h-[48px] px-3 rounded-lg text-[15px] font-medium text-gray-200 hover:bg-white/5"><span class="w-8 h-8 rounded-md bg-white/5 flex items-center justify-center text-blaze">◔</span>Reports</a>
+    </nav>
+  </aside>
+
+  <main id="top" class="relative">
+    <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[480px] h-[480px] rounded-full bg-blaze/10 blur-[120px] opacity-60"></div>
+      <div class="absolute top-1/3 -right-40 w-[520px] h-[520px] rounded-full bg-blaze/5 blur-[140px] opacity-70"></div>
+    </div>
+
+    <section id="dashboard" aria-labelledby="hero-title" class="relative">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-12 lg:pt-16 lg:pb-20">
+        <div id="api-banner" class="hidden mb-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200" style="box-shadow:0 0 0 1px inset rgba(255,180,60,.15),0 0 24px -12px rgba(245,158,11,.45)"></div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
+          <div class="lg:col-span-7 flex flex-col gap-8">
+            <div class="animate-slide-up">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 text-[11px] font-semibold tracking-[0.2em] text-gray-300 uppercase">Sanyam Consultants</div>
+              <h1 id="hero-title" class="mt-5 text-[32px] leading-[1.1] sm:text-[44px] lg:text-[54px] font-extrabold tracking-tight text-white">
+                Attendance<br /><span class="text-transparent bg-clip-text bg-gradient-to-r from-blaze-500 to-blaze-300">Management</span>
+              </h1>
+              <p class="mt-4 max-w-xl text-[15px] sm:text-base leading-relaxed text-gray-400">Simple, accurate and centralized employee attendance management.</p>
+
+              <div class="mt-7 inline-flex flex-col">
+                <div id="hero-weekday" class="text-[11px] font-bold tracking-[0.28em] text-blaze uppercase"></div>
+                <div id="hero-date" class="mt-1 text-xl sm:text-2xl font-bold text-white"></div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 sm:gap-4 animate-slide-up" style="animation-delay:80ms">
+              <article class="stat-card group glow-border rounded-2xl border border-white/5 bg-charcoal-800/70 p-4 sm:p-5 hover:border-blaze/30 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="text-[10px] sm:text-[11px] font-bold tracking-[0.2em] text-gray-400 uppercase">Present</div>
+                <div id="stat-present" class="mt-2 text-3xl sm:text-4xl font-extrabold text-status-present tabular-nums">00</div>
+              </article>
+              <article class="stat-card group glow-border rounded-2xl border border-white/5 bg-charcoal-800/70 p-4 sm:p-5 hover:border-blaze/30 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="text-[10px] sm:text-[11px] font-bold tracking-[0.2em] text-gray-400 uppercase">Half Day</div>
+                <div id="stat-half" class="mt-2 text-3xl sm:text-4xl font-extrabold text-status-half tabular-nums">00</div>
+              </article>
+              <article class="stat-card group glow-border rounded-2xl border border-white/5 bg-charcoal-800/70 p-4 sm:p-5 hover:border-blaze/30 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="text-[10px] sm:text-[11px] font-bold tracking-[0.2em] text-gray-400 uppercase">Leave</div>
+                <div id="stat-leave" class="mt-2 text-3xl sm:text-4xl font-extrabold text-status-leave tabular-nums">00</div>
+              </article>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 sm:gap-4 animate-slide-up" style="animation-delay:140ms">
+              <div class="glow-border rounded-2xl border border-white/5 bg-vb-900/70 p-4 sm:p-5">
+                <div class="text-[10px] sm:text-[11px] font-bold tracking-[0.2em] text-gray-400 uppercase">Total Employees</div>
+                <div id="stat-total" class="mt-2 text-2xl sm:text-3xl font-extrabold text-white tabular-nums">00</div>
+              </div>
+              <div class="glow-border rounded-2xl border border-white/5 bg-vb-900/70 p-4 sm:p-5">
+                <div class="text-[10px] sm:text-[11px] font-bold tracking-[0.2em] text-gray-400 uppercase">Pending Checkout</div>
+                <div id="stat-pending" class="mt-2 text-2xl sm:text-3xl font-extrabold text-blaze tabular-nums">00</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="mark" class="lg:col-span-5 animate-slide-up" style="animation-delay:120ms">
+            <div class="h-full glow-border-strong rounded-2xl lg:rounded-3xl border border-white/5 bg-gradient-to-b from-charcoal-800/80 to-charcoal-800/40 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.8)] p-5 sm:p-7 lg:p-8 flex flex-col">
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <h2 class="text-xl sm:text-2xl font-bold text-white">Mark Attendance</h2>
+                  <p class="mt-1 text-sm text-gray-400">Record today's employee attendance.</p>
+                </div>
+                <div class="hidden sm:inline-flex items-center justify-center w-10 h-10 rounded-xl bg-blaze/10 border border-blaze/20 text-blaze glow-pill">
+                  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>
+                </div>
+              </div>
+
+              <form id="attendance-form" class="mt-6 space-y-5" novalidate>
+                <div>
+                  <label for="f-employee" class="block text-xs font-semibold tracking-wide text-gray-300 mb-1.5">Employee Name</label>
+                  <select id="f-employee" name="employee" required class="glow-input w-full h-11 rounded-lg bg-charcoal-700/60 border border-white/5 focus:border-blaze focus:ring-1 focus:ring-blaze/50 text-white text-sm px-3.5 outline-none transition placeholder:text-gray-500">
+                    <option value="" disabled selected>Select employee</option>
+                    <option>Vijay</option>
+                    <option>Sahil</option>
+                    <option>Janvi</option>
+                    <option>Anju</option>
+                    <option>Garvi</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="f-date" class="block text-xs font-semibold tracking-wide text-gray-300 mb-1.5">Date</label>
+                  <input id="f-date" name="date" type="date" required class="glow-input w-full h-11 rounded-lg bg-charcoal-700/60 border border-white/5 focus:border-blaze focus:ring-1 focus:ring-blaze/50 text-white text-sm px-3.5 outline-none transition [color-scheme:dark]" />
+                </div>
+
+                <div class="grid grid-cols-2 gap-3" id="time-fields-wrap">
+                  <div>
+                    <label for="f-in" class="block text-xs font-semibold tracking-wide text-gray-300 mb-1.5">In Time</label>
+                    <input id="f-in" name="inTime" type="time" class="glow-input w-full h-11 rounded-lg bg-charcoal-700/60 border border-white/5 focus:border-blaze focus:ring-1 focus:ring-blaze/50 text-white text-sm px-3.5 outline-none transition [color-scheme:dark]" />
+                  </div>
+                  <div>
+                    <label for="f-out" name="out" class="block text-xs font-semibold tracking-wide text-gray-300 mb-1.5">Out Time</label>
+                    <input id="f-out" name="outTime" type="time" class="glow-input w-full h-11 rounded-lg bg-charcoal-700/60 border border-white/5 focus:border-blaze focus:ring-1 focus:ring-blaze/50 text-white text-sm px-3.5 outline-none transition [color-scheme:dark]" />
+                  </div>
+                </div>
+
+                <div id="total-hours-row" class="hidden">
+                  <div class="glow-border rounded-lg border border-white/5 bg-vb-900/60 px-4 py-3 flex items-center justify-between">
+                    <span class="text-xs font-semibold tracking-wide text-gray-400 uppercase">Total Hours</span>
+                    <span id="total-hours" class="text-sm font-bold text-white tabular-nums">—</span>
+                  </div>
+                </div>
+
+                <div id="leave-info" class="hidden glow-border rounded-lg border border-blaze/20 bg-blaze/5 px-4 py-3 text-sm text-gray-300" style="box-shadow:0 0 16px -8px rgba(255,90,31,.5)">
+                  Time fields are not required for leave.
+                </div>
+
+                <div id="time-error" class="hidden glow-border rounded-lg border border-status-leave/40 bg-status-leave/10 px-4 py-3 text-sm text-status-leave font-medium" style="box-shadow:0 0 18px -10px rgba(239,68,68,.5)">
+                  Out time cannot be earlier than in time.
+                </div>
+
+                <div>
+                  <label for="f-status" class="block text-xs font-semibold tracking-wide text-gray-300 mb-1.5">Status</label>
+                  <select id="f-status" name="status" required class="glow-input w-full h-11 rounded-lg bg-charcoal-700/60 border border-white/5 focus:border-blaze focus:ring-1 focus:ring-blaze/50 text-white text-sm px-3.5 outline-none transition">
+                    <option value="Present">Present</option>
+                    <option value="Half Day">Half Day</option>
+                    <option value="Leave">Leave</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="f-notes" class="block text-xs font-semibold tracking-wide text-gray-300 mb-1.5">Notes</label>
+                  <textarea id="f-notes" name="notes" rows="3" placeholder="Add a note if required..." class="glow-input w-full rounded-lg bg-charcoal-700/60 border border-white/5 focus:border-blaze focus:ring-1 focus:ring-blaze/50 text-white text-sm px-3.5 py-3 outline-none transition resize-none placeholder:text-gray-500"></textarea>
+                </div>
+
+                <button id="submit-btn" type="submit" class="group relative w-full h-12 rounded-lg bg-gradient-to-b from-blaze-400 to-blaze-500 hover:from-blaze-300 hover:to-blaze-400 text-white font-bold tracking-wide text-sm shadow-glow-orange transition active:scale-[.98] disabled:opacity-70 disabled:cursor-not-allowed disabled:shadow-none">
+                  <span id="submit-label" class="inline-flex items-center gap-2">
+                    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>
+                    SAVE ATTENDANCE
+                  </span>
+                  <span id="submit-spinner" class="hidden items-center gap-2">
+                    <span class="spinner"></span>
+                    SAVING...
+                  </span>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="records" aria-labelledby="records-title" class="relative">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 lg:pb-24">
+        <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 id="records-title" class="text-xl sm:text-2xl font-bold text-white">Today's Attendance</h2>
+            <p class="mt-1 text-sm text-gray-400">Records for the selected date. Search and filter below.</p>
+          </div>
+          <div id="records-count" class="text-xs font-semibold tracking-wide text-gray-400">0 records</div>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-12 gap-3">
+          <div class="md:col-span-4 lg:col-span-5 relative">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+            <input id="search-input" type="search" placeholder="Search attendance..." class="glow-input w-full h-11 rounded-lg bg-charcoal-800/60 border border-white/5 focus:border-blaze focus:ring-1 focus:ring-blaze/50 text-white text-sm pl-10 pr-3.5 outline-none transition placeholder:text-gray-500" />
+          </div>
+          <div class="md:col-span-8 lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label for="filter-date" class="sr-only">Date filter</label>
+              <input id="filter-date" type="date" class="glow-input w-full h-11 rounded-lg bg-charcoal-800/60 border border-white/5 focus:border-blaze focus:ring-1 focus:ring-blaze/50 text-white text-sm px-3 outline-none transition [color-scheme:dark]" />
+            </div>
+            <div>
+              <label for="filter-employee" class="sr-only">Employee filter</label>
+              <select id="filter-employee" class="glow-input w-full h-11 rounded-lg bg-charcoal-800/60 border border-white/5 focus:border-blaze focus:ring-1 focus:ring-blaze/50 text-white text-sm px-3 outline-none transition">
+                <option value="">All Employees</option>
+                <option>Vijay</option><option>Sahil</option><option>Janvi</option><option>Anju</option><option>Garvi</option>
+              </select>
+            </div>
+            <div>
+              <label for="filter-status" class="sr-only">Status filter</label>
+              <select id="filter-status" class="glow-input w-full h-11 rounded-lg bg-charcoal-800/60 border border-white/5 focus:border-blaze focus:ring-1 focus:ring-blaze/50 text-white text-sm px-3 outline-none transition">
+                <option value="">All Status</option>
+                <option>Present</option>
+                <option>Half Day</option>
+                <option>Leave</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="skeleton-wrap" class="mt-6 space-y-3 hidden">
+          <div class="glow-border rounded-xl border border-white/5 bg-charcoal-800/50 h-14 animate-pulse"></div>
+          <div class="glow-border rounded-xl border border-white/5 bg-charcoal-800/50 h-14 animate-pulse"></div>
+          <div class="glow-border rounded-xl border border-white/5 bg-charcoal-800/50 h-14 animate-pulse"></div>
+        </div>
+
+        <div id="records-table-wrap" class="mt-6 glow-border rounded-2xl border border-white/5 bg-charcoal-800/40 overflow-hidden hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-white/[0.02] border-b border-white/5">
+                <tr class="text-[11px] uppercase tracking-[0.14em] text-gray-400">
+                  <th class="px-4 sm:px-5 py-3.5 font-semibold">Employee</th>
+                  <th class="px-4 sm:px-5 py-3.5 font-semibold">In Time</th>
+                  <th class="px-4 sm:px-5 py-3.5 font-semibold">Out Time</th>
+                  <th class="px-4 sm:px-5 py-3.5 font-semibold">Total Hours</th>
+                  <th class="px-4 sm:px-5 py-3.5 font-semibold">Status</th>
+                  <th class="hidden md:table-cell px-4 sm:px-5 py-3.5 font-semibold">Notes</th>
+                  <th class="px-4 sm:px-5 py-3.5 font-semibold text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="records-tbody" class="divide-y divide-white/5"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="records-cards-wrap" class="mt-6 md:hidden space-y-3 hidden"></div>
+
+        <div id="records-empty" class="mt-10 glow-border rounded-2xl border border-dashed border-white/10 p-10 text-center hidden" style="box-shadow:0 0 22px -14px rgba(255,106,0,.35)">
+          <div class="mx-auto w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 mb-3 glow-pill">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path><path d="M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2H9V5z"></path></svg>
+          </div>
+          <div class="text-sm font-semibold text-white">No attendance records found.</div>
+          <div class="mt-1 text-xs text-gray-400">Try adjusting your search or filters.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="reports" aria-labelledby="reports-title" class="relative">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 lg:pb-24">
+        <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 id="reports-title" class="text-xl sm:text-2xl font-bold text-white">Monthly Report</h2>
+            <p class="mt-1 text-sm text-gray-400">View attendance summary by month and employee.</p>
+          </div>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
+          <div class="lg:col-span-4">
+            <label for="r-month" class="block text-xs font-semibold tracking-wide text-gray-300 mb-1.5">Month</label>
+            <input id="r-month" type="month" class="glow-input w-full h-11 rounded-lg bg-charcoal-800/60 border border-white/5 focus:border-blaze focus:ring-1 focus:ring-blaze/50 text-white text-sm px-3 outline-none transition [color-scheme:dark]" />
+          </div>
+          <div class="lg:col-span-4">
+            <label for="r-employee" class="block text-xs font-semibold tracking-wide text-gray-300 mb-1.5">Employee</label>
+            <select id="r-employee" class="glow-input w-full h-11 rounded-lg bg-charcoal-800/60 border border-white/5 focus:border-blaze focus:ring-1 focus:ring-blaze/50 text-white text-sm px-3 outline-none transition">
+              <option value="">All Employees</option>
+              <option>Vijay</option><option>Sahil</option><option>Janvi</option><option>Anju</option><option>Garvi</option>
+            </select>
+          </div>
+          <div class="lg:col-span-4 flex items-end">
+            <button id="r-run" type="button" class="glow-border w-full h-11 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 text-white font-semibold text-sm transition">Generate Report</button>
+          </div>
+        </div>
+
+        <div id="report-empty" class="mt-8 glow-border rounded-2xl border border-dashed border-white/10 p-10 text-center text-sm text-gray-400" style="box-shadow:0 0 22px -14px rgba(255,106,0,.35)">
+          Select a month to generate the attendance report.
+        </div>
+
+        <div id="report-wrap" class="mt-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 hidden"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="dup-modal" role="dialog" aria-modal="true" aria-labelledby="dup-title" class="fixed inset-0 z-[60] hidden items-center justify-center p-4">
+    <div id="dup-overlay" class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+    <div class="glow-border-strong relative w-full max-w-md rounded-2xl border border-white/5 bg-vb-900 shadow-2xl p-6 animate-slide-in-up">
+      <div class="flex items-start gap-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 glow-pill">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"></path><path d="M12 17h.01"></path><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg>
+        </div>
+        <div class="flex-1">
+          <h3 id="dup-title" class="text-base font-bold text-white">Attendance already exists</h3>
+          <p id="dup-text" class="mt-1 text-sm text-gray-400">An attendance record already exists for this employee on this date.</p>
+        </div>
+      </div>
+      <div class="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+        <button id="dup-cancel" type="button" class="h-11 px-5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 text-sm font-semibold text-white transition">Cancel</button>
+        <button id="dup-update" type="button" class="h-11 px-5 rounded-lg bg-gradient-to-b from-blaze-400 to-blaze-500 hover:from-blaze-300 hover:to-blaze-400 text-sm font-bold text-white shadow-glow-orange transition active:scale-[.98]">Update Existing Record</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title" class="fixed inset-0 z-[65] hidden items-center justify-center p-4">
+    <div id="confirm-overlay" class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+    <div class="relative w-full max-w-md rounded-2xl border border-white/5 bg-vb-900 shadow-2xl p-6 animate-slide-in-up">
+      <div class="flex items-start gap-3">
+        <div class="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>
+        </div>
+        <div class="flex-1">
+          <h3 id="confirm-title" class="text-base font-bold text-white">Delete record</h3>
+          <p id="confirm-text" class="mt-1 text-sm text-gray-400"></p>
+        </div>
+      </div>
+      <div class="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+        <button id="confirm-cancel" type="button" class="h-11 px-5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 text-sm font-semibold text-white transition">Cancel</button>
+        <button id="confirm-ok" type="button" class="h-11 px-5 rounded-lg bg-gradient-to-b from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 text-sm font-bold text-white transition active:scale-[.98]">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="border-t border-white/5 bg-vb-950/80 mt-4">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
+      <div class="font-medium">&copy; 2026 Sanyam Consultants</div>
+      <div class="tracking-wide">Attendance Management System</div>
+    </div>
+  </footer>
+
+  <div id="toast-root" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[70] flex flex-col gap-2 w-[calc(100%-2rem)] max-w-sm pointer-events-none"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/attendance.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
