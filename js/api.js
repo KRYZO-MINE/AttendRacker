@@ -4,7 +4,7 @@
    Paste your deployed Google Apps Script Web App URL below.
    Example: "https://script.google.com/macros/s/XXXXXXX/exec"
    ========================================================= */
-const API_URL = "";
+const API_URL = "https://script.google.com/macros/s/AKfycbxQBQ9vL3OInhJ-HFv-4PYZ-3z7F9DaOW9CvqYqo72ctvsiteScTSX-DoLs2LoXuIgaFg/exec";
 const DEMO_MODE = false;
 
 const EMPLOYEE_ROSTER = ["Vijay", "Sahil", "Janvi", "Anju", "Garvi"];
