@@ -165,12 +165,16 @@ function normalizeResp(json) {
 
 /* ================================
    GET — Fetch Attendance
-   Strategy: Try JSONP first; if it fails (e.g. old Apps Script deployment,
-   extension block, MIME nosniff block) fall back to text/plain POST
-   with action=getAttendance. POST text/plain is a CORS "simple request" —
-   no preflight, survives 302 redirects to googleusercontent.com reliably,
-   AND works with BOTH old (add/update/delete actions) AND new Code.gs
-   (adds getAttendance action for POST).
+   Strategy (4 transports, order matters):
+     1. JSONP — GET semantics, fastest. Requires redeployed Apps Script
+        with doGet ?callback=... wrap support.
+     2. POST text/plain action=getAttendance — no preflight, survives 302
+        redirects. Requires redeployed Apps Script with doPost
+        getAttendance action.
+     3. GET redirect:manual → extract Location echo URL → direct GET on
+        echo URL. Works with OLD Code.gs too because old Code.gs doGet
+        already returns valid {"success":true,"records":[...]} JSON on
+        direct GET (user verified manually in new tab earlier).
    ================================ */
 async function fetchAttendance() {
   if (DEMO_MODE === true) {
@@ -181,7 +185,7 @@ async function fetchAttendance() {
     return { success: false, error: "Google Apps Script API is not configured.", notConfigured: true, data: [] };
   }
 
-  // Transport 1: JSONP (ideal — GET semantics, cached)
+  // Transport 1: JSONP
   try {
     const raw = await jsonpGet(API_URL, 25000);
     return normalizeResp(raw);
@@ -190,27 +194,48 @@ async function fetchAttendance() {
   // Transport 2: text/plain POST with action=getAttendance
   try {
     const raw = await formPost({ action: "getAttendance" });
-    // Old Code.gs does not know action=getAttendance in doPost, returns:
-    //   { success:false, error:"Unknown action" }
-    // Treat this as "not yet redeployed" → return empty data with friendly
-    // error so user can still submit records; records list appears empty
-    // until Apps Script is redeployed with the new Code.gs.
     if (raw && raw.success === false && /unknown action/i.test(raw.error || "")) {
-      return {
-        success: true,
-        data: [],
-        _notRedeployed: true,
-        error: "Records list needs Apps Script redeploy — save/edit/delete still work."
-      };
+      // Old script → fall through to next transport instead of returning empty
+    } else if (raw) {
+      return normalizeResp(raw);
     }
-    return normalizeResp(raw);
-  } catch (e2) {
-    return {
-      success: false,
-      error: e2.message || "Cannot reach Apps Script — check deployment 'Who has access' = Anyone, disable ad/privacy extensions, then refresh.",
-      data: []
-    };
-  }
+  } catch (_e2) { /* fall through */ }
+
+  // Transport 3: GET exec redirect:manual → extract Location echo URL → GET echo
+  // Old Code.gs doGet ALREADY returns valid JSON on direct GET (proven by user).
+  // exec → 302 → echo?user_content_key=... — and echo URL is googleusercontent
+  // which has proper CORS headers, so direct fetch(echo, {GET}) succeeds.
+  try {
+    const probe = await fetch(API_URL, {
+      method: "GET",
+      redirect: "manual"
+    });
+    const loc = probe.headers.get("Location");
+    if (loc) {
+      const follow = await fetch(loc, { method: "GET", redirect: "follow" });
+      const text = await follow.text();
+      let json = null;
+      try { json = JSON.parse(text); } catch (_) {
+        const m = /\(([\s\S]*)\)\s*;?\s*$/.exec(text);
+        if (m) try { json = JSON.parse(m[1]); } catch(__) {}
+      }
+      if (json && typeof json === "object") return normalizeResp(json);
+    }
+    // If no Location somehow, try the response body itself
+    try {
+      const text = await probe.text();
+      const json = JSON.parse(text);
+      if (json && typeof json === "object") return normalizeResp(json);
+    } catch (_) {}
+  } catch (_e3) { /* fall through */ }
+
+  // All transports failed. Old script didn't have getAttendance POST action
+  // AND JSONP+echo GET failed (network/extension/CORS).
+  return {
+    success: false,
+    error: "Cannot fetch records — check deployment 'Who has access' = Anyone, disable ad/privacy extensions, then refresh. (Save/Edit/Delete still work.)",
+    data: []
+  };
 }
 
 /* ================================
