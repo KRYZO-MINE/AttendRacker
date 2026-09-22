@@ -71,19 +71,24 @@ function jsonpGet(url, timeoutMs) {
 }
 
 /* -----------------------------------------------------------
-   POST helper — uses application/x-www-form-urlencoded
-   (this is a "simple request" per CORS spec — NO preflight,
-   so it works even when Google Apps Script redirects)
+   POST helper — uses Content-Type: text/plain
+   Per CORS spec, text/plain (along with application/x-www-form-urlencoded
+   and multipart/form-data) is a "simple request" and NEVER triggers a
+   preflight OPTIONS. Google Apps Script leaves e.postData.contents
+   intact for text/plain (unlike form-urlencoded where it auto-parses
+   and empties postData.contents), so this payload format works with
+   BOTH old Code.gs (reads postData JSON directly) AND new Code.gs
+   (has fallback params.payload parser for form-urlencoded too).
    ----------------------------------------------------------- */
 async function formPost(payload) {
-  const bodyData = "payload=" + encodeURIComponent(JSON.stringify(payload));
+  const jsonStr = JSON.stringify(payload);
   const res = await fetch(API_URL, {
     method: "POST",
     redirect: "follow",
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
+      "Content-Type": "text/plain;charset=utf-8"
     },
-    body: bodyData
+    body: jsonStr
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const text = await res.text();
@@ -91,7 +96,6 @@ async function formPost(payload) {
   try {
     json = JSON.parse(text);
   } catch (_) {
-    // If response is JSONP-wrapped despite POST, try to extract it
     const m = /\(([\s\S]*)\)\s*;?\s*$/.exec(text);
     json = m ? JSON.parse(m[1]) : { success: true };
   }
@@ -113,9 +117,11 @@ function normalizeResp(json) {
 /* ================================
    GET — Fetch Attendance
    Strategy: Try JSONP first; if it fails (e.g. old Apps Script deployment,
-   extension block, MIME nosniff block) fall back to form-urlencoded POST
-   with action=getAttendance. POST is a CORS "simple request" — no preflight,
-   survives 302 redirects to googleusercontent.com reliably.
+   extension block, MIME nosniff block) fall back to text/plain POST
+   with action=getAttendance. POST text/plain is a CORS "simple request" —
+   no preflight, survives 302 redirects to googleusercontent.com reliably,
+   AND works with BOTH old (add/update/delete actions) AND new Code.gs
+   (adds getAttendance action for POST).
    ================================ */
 async function fetchAttendance() {
   if (DEMO_MODE === true) {
@@ -130,18 +136,29 @@ async function fetchAttendance() {
   try {
     const raw = await jsonpGet(API_URL, 25000);
     return normalizeResp(raw);
-  } catch (_e1) {
-    // fall through silently to Transport 2
-  }
+  } catch (_e1) { /* fall through */ }
 
-  // Transport 2: form-urlencoded POST with action=getAttendance
+  // Transport 2: text/plain POST with action=getAttendance
   try {
     const raw = await formPost({ action: "getAttendance" });
+    // Old Code.gs does not know action=getAttendance in doPost, returns:
+    //   { success:false, error:"Unknown action" }
+    // Treat this as "not yet redeployed" → return empty data with friendly
+    // error so user can still submit records; records list appears empty
+    // until Apps Script is redeployed with the new Code.gs.
+    if (raw && raw.success === false && /unknown action/i.test(raw.error || "")) {
+      return {
+        success: true,
+        data: [],
+        _notRedeployed: true,
+        error: "Records list needs Apps Script redeploy — save/edit/delete still work."
+      };
+    }
     return normalizeResp(raw);
   } catch (e2) {
     return {
       success: false,
-      error: e2.message || "Cannot reach Apps Script — Redeploy Code.gs with 'Anyone' access, disable ad/privacy extensions, then refresh.",
+      error: e2.message || "Cannot reach Apps Script — check deployment 'Who has access' = Anyone, disable ad/privacy extensions, then refresh.",
       data: []
     };
   }
