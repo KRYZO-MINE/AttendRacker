@@ -44,10 +44,12 @@ async function fetchAttendance() {
     return { success: false, error: "Google Apps Script API is not configured.", notConfigured: true, data: [] };
   }
   try {
-    const res = await fetch(API_URL, { method: "GET", headers: { "Accept": "application/json" } });
+    const res = await fetch(API_URL, { method: "GET", redirect: "follow" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
     if (!json || typeof json !== "object") throw new Error("Invalid response");
+    // Normalize key: Apps Script returns "records", frontend expects "data"
+    if (!json.data && Array.isArray(json.records)) json.data = json.records;
     json.data = Array.isArray(json.data) ? json.data : [];
     return json;
   } catch (e) {
@@ -76,7 +78,8 @@ async function submitAttendance(record) {
   try {
     const res = await fetch(API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      redirect: "follow",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(payload)
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -108,7 +111,8 @@ async function updateAttendance(record) {
   try {
     const res = await fetch(API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      redirect: "follow",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(payload)
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -131,7 +135,8 @@ async function deleteAttendance(date, employee) {
   try {
     const res = await fetch(API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      redirect: "follow",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(payload)
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
